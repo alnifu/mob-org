@@ -8,7 +8,7 @@ import { format, isAfter, isBefore, isSameDay } from 'date-fns';
 type Event = {
   id: string;
   title: string;
-  description: string;
+  content: string;
   image_urls: string[];
   created_at: string;
   event_date: string;
@@ -99,8 +99,8 @@ export const EventsScreen = () => {
   const renderEvent = ({ item }: { item: Event }) => (
     <Card style={styles.card} mode="outlined">
       <Card.Title
-        title={item.title}
-        subtitle={format(new Date(item.event_date), 'MMM dd, yyyy h:mm a')}
+        title={item.organization.name}
+        subtitle={format(new Date(item.created_at), 'MMM dd, yyyy h:mm a')}
         left={(props) => (
           <Avatar.Image
             {...props}
@@ -112,7 +112,8 @@ export const EventsScreen = () => {
         <Card.Cover source={{ uri: item.image_urls[0] }} />
       )}
       <Card.Content>
-        <Text variant="bodyMedium">{item.description}</Text>
+      <Text style={{ fontWeight: 'bold',  paddingTop: 10, paddingBottom: 10, fontSize: 18 }}>{item.title}</Text>
+      <Text variant="bodyMedium">{item.content}</Text>
         
         <View style={styles.eventDetails}>
           <Chip icon="calendar" style={styles.chip}>
@@ -126,11 +127,7 @@ export const EventsScreen = () => {
           )}
         </View>
         
-        <View style={styles.eventFooter}>
-          <Text variant="bodySmall">
-            Organized by {item.organization.name}
-          </Text>
-        </View>
+        
       </Card.Content>
     </Card>
   );

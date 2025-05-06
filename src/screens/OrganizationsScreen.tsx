@@ -73,24 +73,28 @@ export const OrganizationsScreen = () => {
 
   const renderOrganization = ({ item }: { item: Organization }) => (
     <Card style={styles.card} mode="outlined">
-      <Card.Title
-        title={item.name}
-        subtitle={item.status}
-        left={(props) => (
-          <Avatar.Image
-            {...props}
-            source={{ uri: item.logo_url || 'https://via.placeholder.com/50' }}
-          />
-        )}
+  <Card.Title
+    title={item.name}
+    left={(props) => (
+      <Avatar.Image
+        {...props}
+        source={{ uri: item.logo_url || 'https://via.placeholder.com/50' }}
       />
-      <Card.Content>
-        <Text variant="bodyMedium">{item.description}</Text>
-        
-        <View style={styles.contactInfo}>
-          <Text variant="bodySmall">Contact: {item.contact_email}</Text>
-        </View>
-      </Card.Content>
-    </Card>
+    )}
+  />
+
+  {/* Line underneath the title */}
+  <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', marginHorizontal: 16, marginBottom: 8 }} />
+
+  <Card.Content>
+    <Text variant="bodyMedium">{item.description}</Text>
+
+    <View style={styles.contactInfo}>
+      <Text variant="bodyMedium">Contact: {item.contact_email}</Text>
+    </View>
+  </Card.Content>
+</Card>
+
   );
 
   if (loading && !refreshing) {

@@ -301,7 +301,7 @@ export const ProfileScreen = ({ navigation }: any) => {
           
           <List.Section>
             <List.Item
-              title="Member Since"
+              title="Account Created"
               description={member ? format(new Date(member.created_at), 'MMMM dd, yyyy') : 'N/A'}
               left={props => <List.Icon {...props} icon="calendar" />}
             />
