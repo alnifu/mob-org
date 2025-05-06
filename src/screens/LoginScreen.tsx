@@ -147,7 +147,7 @@ export const LoginScreen = ({ navigation }: any) => {
             resizeMode="contain"
           />
           <Text style={styles.title}>DLSL Organizations</Text>
-          <Text style={styles.subtitle}>Sign in with your DLSL email</Text>
+          <Text style={styles.subtitle}>{isSignUp ? 'Sign Up' : 'Sign In'} with your DLSL email</Text>
           
           {error && (
             <Text style={styles.error}>{error}</Text>
