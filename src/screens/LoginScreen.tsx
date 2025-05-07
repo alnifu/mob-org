@@ -80,7 +80,7 @@ export const LoginScreen = ({ navigation }: any) => {
 
       // Validate email format
       if (!email.endsWith('@dlsl.edu.ph')) {
-        setError('Only DLSU email addresses are allowed');
+        setError('Only @dlsl.edu.ph email address.');
         return;
       }
 
