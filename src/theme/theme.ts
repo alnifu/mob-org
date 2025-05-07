@@ -4,9 +4,9 @@ export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#006341', // DLSU Green
-    secondary: '#862121', // DLSU Red
-    accent: '#FDB913', // DLSU Gold
+    primary: '#006341',
+    secondary: '#862121',
+    accent: '#FDB913',
     background: '#FFFFFF',
     surface: '#FFFFFF',
     text: '#000000',
