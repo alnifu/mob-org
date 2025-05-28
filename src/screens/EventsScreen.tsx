@@ -39,8 +39,23 @@ export const EventsScreen = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      
-      const { data, error } = await supabase
+  
+      const { data: { user } } = await supabase.auth.getUser();
+  
+      let memberOrgIds: string[] = [];
+      if (user) {
+        const { data: memberData, error: memberError } = await supabase
+          .from('members')
+          .select('organization_ids')
+          .eq('id', user.id)
+          .single();
+  
+        if (!memberError && memberData) {
+          memberOrgIds = memberData.organization_ids || [];
+        }
+      }
+  
+      const { data: eventsData, error: eventsError } = await supabase
         .from('posts')
         .select(`
           *,
@@ -49,17 +64,26 @@ export const EventsScreen = () => {
         `)
         .not('event_date', 'is', null)
         .order('event_date', { ascending: true });
-      
-      if (error) throw error;
-      
-      setEvents(data || []);
-      filterEventsByCategory(data || [], category);
+  
+      if (eventsError) throw eventsError;
+  
+      let visibleEvents = eventsData || [];
+  
+      visibleEvents = visibleEvents.filter(event => {
+        if (!event.is_members_only) return true;
+        return memberOrgIds.includes(event.organization_id);
+      });
+  
+      setEvents(visibleEvents);
+      filterEventsByCategory(visibleEvents, category);
+  
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchEvents();

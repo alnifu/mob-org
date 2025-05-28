@@ -90,10 +90,23 @@ export const HomeScreen = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      
+  
       const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
+  
+      let memberOrgIds: string[] = [];
+      if (user) {
+        const { data: memberData, error: memberError } = await supabase
+          .from('members')
+          .select('organization_ids')
+          .eq('id', user.id)
+          .single();
+  
+        if (!memberError && memberData) {
+          memberOrgIds = memberData.organization_ids || [];
+        }
+      }
+  
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select(`
           *,
@@ -101,36 +114,41 @@ export const HomeScreen = () => {
           officer:officers(first_name, last_name, profile_picture_url)
         `)
         .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      // If user is logged in, check which posts are liked
-      let postsWithLikeStatus = data || [];
-      
+  
+      if (postsError) throw postsError;
+  
+      let visiblePosts = postsData || [];
+  
+      visiblePosts = visiblePosts.filter(post => {
+        if (!post.is_members_only) return true;
+        return memberOrgIds.includes(post.organization_id);
+      });
+  
       if (user) {
         const { data: likes, error: likesError } = await supabase
           .from('post_likes')
           .select('post_id')
           .eq('user_id', user.id);
-          
+  
         if (!likesError && likes) {
           const likedPostIds = new Set(likes.map(like => like.post_id));
-          
-          postsWithLikeStatus = postsWithLikeStatus.map(post => ({
+          visiblePosts = visiblePosts.map(post => ({
             ...post,
-            isLiked: likedPostIds.has(post.id)
+            isLiked: likedPostIds.has(post.id),
           }));
         }
       }
-      
-      setPosts(postsWithLikeStatus);
-      setFilteredPosts(postsWithLikeStatus);
+  
+      setPosts(visiblePosts);
+      setFilteredPosts(visiblePosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   useEffect(() => {
     fetchPosts();
