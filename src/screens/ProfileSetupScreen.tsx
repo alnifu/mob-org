@@ -4,6 +4,8 @@ import { TextInput, Button, Text, Surface, ActivityIndicator } from 'react-nativ
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../services/supabase';
 import { theme } from '../theme/theme';
+import * as FileSystem from 'expo-file-system';
+
 
 export const ProfileSetupScreen = ({ route, navigation }: any) => {
   const { userInfo } = route.params;
@@ -46,7 +48,7 @@ export const ProfileSetupScreen = ({ route, navigation }: any) => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
@@ -77,13 +79,17 @@ export const ProfileSetupScreen = ({ route, navigation }: any) => {
       if (userError) throw userError;
       if (!user) throw new Error('No user found');
 
-      const arrayBuffer = await fetch(uri).then((res) => res.arrayBuffer());
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      
       const fileExt = uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
       const path = `${user.id}.${fileExt}`;
 
       const { data, error: uploadError } = await supabase.storage
         .from('profile-pictures')
-        .upload(path, arrayBuffer, {
+        .upload(path, byteArray.buffer, {
           contentType: 'image/jpeg',
           upsert: true
         });
